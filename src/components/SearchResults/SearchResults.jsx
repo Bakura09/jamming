@@ -1,10 +1,10 @@
 import TrackList from "../TrackList/TrackList";
 
-function SearchResults({ searchResults }) {
+function SearchResults({ searchResults, onAdd }) {
   return (
     <div>
       <h2>Results</h2>
-      <TrackList songs={searchResults} />
+      <TrackList tracks={searchResults} onAdd={onAdd} />
     </div>
   );
 }

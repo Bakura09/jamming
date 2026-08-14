@@ -1,24 +1,19 @@
 import { useCallback, useState } from "react";
 
 function SearchBar({ onSearch }) {
-  const [passTerm, setPassTerm] = useState("");
+  const [term, setTerm] = useState("");
 
   const handleChange = ({ target }) => {
-    setPassTerm(target.value);
+    setTerm(target.value);
   };
 
   const search = useCallback(() => {
-    onSearch(passTerm);
-  }, [onSearch, passTerm]);
+    onSearch(term);
+  }, [term, onSearch]);
 
   return (
     <div className="searchbar">
-      <input
-        type="search"
-        placeholder="Enter a Song Title"
-        onChange={handleChange}
-        value={passTerm}
-      />
+      <input placeholder="Enter a Song Title" onChange={handleChange} />
       <button type="button" onClick={search}>
         SEARCH
       </button>

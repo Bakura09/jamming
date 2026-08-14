@@ -1,16 +1,20 @@
 import Tracks from "../Tracks/Tracks";
 
-function TrackList({ songs }) {
+function TrackList({ tracks, onAdd, onRemove, isRemoval }) {
   return (
-    <div>
-      {songs.map((track) => {
+    <ul>
+      {tracks.map((track) => {
         return (
-          <div>
-            <Tracks track={track} key={track.id} />;
-          </div>
+          <Tracks
+            track={track}
+            key={track.id}
+            isRemoval={isRemoval}
+            onAdd={onAdd}
+            onRemove={onRemove}
+          />
         );
       })}
-    </div>
+    </ul>
   );
 }
 

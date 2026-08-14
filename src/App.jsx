@@ -13,15 +13,27 @@ function App() {
   const tracksResults = playListResult.tracks.items;
 
   const [searchResults, setSearchResults] = useState(tracks);
-  const [playListTracks, setPlayListTracks] = useState(tracksResults);
+  const [playListTracks, setPlayListTracks] = useState([]);
 
   const search = useCallback((term) => {
     // trigger spotify search
   }, []);
 
-  const addTrack = useCallback((track) => {}, []);
+  const addTrack = useCallback(
+    (track) => {
+      if (playListTracks.some((savedTrack) => savedTrack.id === track.id))
+        return;
 
-  const removeTrack = useCallback((track) => {}, []);
+      setPlayListTracks((prevTracks) => [...prevTracks, track]);
+    },
+    [playListTracks],
+  );
+
+  const removeTrack = useCallback((track) => {
+    setPlayListTracks((prevTracks) =>
+      prevTracks.filter((currentTrack) => currentTrack.id !== track.id),
+    );
+  }, []);
 
   return (
     <>

@@ -1,5 +1,3 @@
-// items > artists [] > name
-
 import { useCallback } from "react";
 
 function Tracks({ track, onAdd, onRemove, isRemoval }) {

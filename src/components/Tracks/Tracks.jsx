@@ -1,19 +1,13 @@
 import { useCallback } from "react";
 
 function Tracks({ track, onAdd, onRemove, isRemoval }) {
-  const addTrack = useCallback(
-    (event) => {
-      onAdd(track);
-    },
-    [onAdd, track],
-  );
+  const addTrack = useCallback(() => {
+    onAdd(track);
+  }, [onAdd, track]);
 
-  const removeTrack = useCallback(
-    (event) => {
-      onRemove(track);
-    },
-    [onRemove, track],
-  );
+  const removeTrack = useCallback(() => {
+    onRemove(track);
+  }, [onRemove, track]);
 
   const renderAction = () => {
     if (isRemoval) {
@@ -38,7 +32,9 @@ function Tracks({ track, onAdd, onRemove, isRemoval }) {
         <p>
           {track.artists?.map((artist) => artist.name).join(", ")} |{" "}
           {track.album?.name} |{" "}
-          <a href={track.external_urls?.spotify}>Track Link</a>
+          <a href={track.external_urls?.spotify} target="_blank">
+            Track Link
+          </a>
         </p>
         {renderAction()}
       </li>

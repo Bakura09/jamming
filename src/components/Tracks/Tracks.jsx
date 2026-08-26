@@ -26,19 +26,21 @@ function Tracks({ track, onAdd, onRemove, isRemoval }) {
   };
 
   return (
-    <>
-      <li>
+    <div>
+      <div>
         <h3>{track.name}</h3>
         <p>
-          {track.artists?.map((artist) => artist.name).join(", ")} |{" "}
-          {track.album?.name} |{" "}
-          <a href={track.external_urls?.spotify} target="_blank">
+          <strong>Artists:</strong>{" "}
+          {track.artists.map((artist) => artist.name).join(" ")} | {track.album}
+        </p>
+        <p>
+          <a href={track.external_urls} target="_blank">
             Track Link
           </a>
         </p>
-        {renderAction()}
-      </li>
-    </>
+      </div>
+      {renderAction()}
+    </div>
   );
 }
 

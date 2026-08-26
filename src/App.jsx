@@ -1,16 +1,33 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import "./App.css";
 
 import SearchBar from "./components/SearchBar/SearchBar.jsx";
 import SearchResults from "./components/SearchResults/SearchResults.jsx";
 import PlayList from "./components/PlayList/PlayList.jsx";
-import Spotify from "./util/spotify.js";
+import Spotify from "./util/Spotify.js";
 
 function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [playListTracks, setPlayListTracks] = useState([]);
   const [playListName, setPlayListName] = useState("New Playlist");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authorizationCode = urlParams.get("code");
+
+    if (!authorizationCode) {
+      return;
+    }
+
+    window.history.replaceState({}, document.title, "/");
+
+    Spotify.getToken(authorizationCode).catch((error) => console.log(error));
+  }, []);
+
+  const getUserAuthorization = useCallback(() => {
+    Spotify.authorize();
+  }, []);
 
   const search = useCallback((term) => {
     Spotify.search(term).then(setSearchResults);
@@ -45,11 +62,14 @@ function App() {
   }, []);
 
   return (
-    <>
-      <h2>
+    <div>
+      <button type="button" onClick={getUserAuthorization}>
+        Authorize Spotify
+      </button>
+      <h1>
         Ja<span className="title">mmm</span>ing
-      </h2>
-      <p>Enter a track name</p>
+      </h1>
+      <h4>Enter a track name</h4>
       <SearchBar onSearch={search} />
       <SearchResults searchResults={searchResults} onAdd={addTrack} />
       <PlayList
@@ -59,7 +79,7 @@ function App() {
         onRemove={removeTrack}
         onSave={savePlayList}
       />
-    </>
+    </div>
   );
 }
 

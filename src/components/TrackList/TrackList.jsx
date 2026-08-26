@@ -2,7 +2,7 @@ import Tracks from "../Tracks/Tracks";
 
 function TrackList({ tracks, onAdd, onRemove, isRemoval }) {
   return (
-    <ul>
+    <div>
       {tracks.map((track) => {
         return (
           <Tracks
@@ -14,7 +14,7 @@ function TrackList({ tracks, onAdd, onRemove, isRemoval }) {
           />
         );
       })}
-    </ul>
+    </div>
   );
 }
 

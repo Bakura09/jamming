@@ -31,7 +31,8 @@ const Spotify = {
     const codeChallenge = base64encode(hashed);
 
     // Authorization step
-    const scope = "user-read-private user-read-email";
+    const scope =
+      "user-read-private user-read-email playlist-modify-private playlist-modify-public";
     const authUrl = new URL("https://accounts.spotify.com/authorize");
 
     // generated in the previous step
@@ -119,57 +120,62 @@ const Spotify = {
   },
 
   async createPlaylist(playlistName, trackUris) {
-    const accessToken = localStorage.getItem("access_token");
-    const userEndpoint = "https://api.spotify.com/v1/me";
-    const userHeaders = { Authorization: `Bearer ${accessToken}` };
-    let userId;
- 
-    try {
-      const userResponse = await fetch(userEndpoint, headers);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user ID: ${response.statusText}`);
-      }
-      const userJsonResponse = await userResponse.json();
-      userId = userJsonResponse.id;
+    if (!playlistName || !trackUris.length) {
+      return [];
+    }
 
-      const playlistEndpoint = `https://api.spotify.com/v1/users/${userId}/playlists`;
+    const accessToken = localStorage.getItem("access_token");
+
+    try {
+      // Create the playlist
+      const playlistEndpoint = `https://api.spotify.com/v1/me/playlists`;
       let playlist;
+
       const playlistResponse = await fetch(playlistEndpoint, {
         method: "POST",
-        Headers: {
+        headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          name: playlistName,
-          description: "Created with Spotify API",
-          public: true
-         }),
+        body: JSON.stringify({ name: playlistName }),
       });
+
+      if (!playlistResponse.ok) {
+        const responseBody = await playlistResponse.json();
+        throw new Error(
+          responseBody.error?.message || "Spotify playlist creation failed",
+        );
+      }
 
       const playlistjsonResponse = await playlistResponse.json();
       playlist = playlistjsonResponse.id;
 
-      const addTracksEndpoint = `https://api.spotify.com/v1/playlists/${playlist}/items
-`
+      // Add the tracks to the playlist
+      const addTracksEndpoint = `https://api.spotify.com/v1/playlists/${playlist}/items`;
       const addTracks = await fetch(addTracksEndpoint, {
         method: "POST",
-        Headers: {
+        headers: {
           Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: json.stringify({
+        body: JSON.stringify({
           uris: trackUris,
           position: 0,
-        })
+        }),
       });
 
-      const addTracksJson = addTracks.json();
-      return addTracksJson;
-      
-      } catch (error) {
-      console.log(error);
-}}}
+      const addTracksJson = await addTracks.json();
+      if (!addTracks.ok) {
+        throw new Error(
+          addTracksJson.error?.message || "Spotify tracks could not be added",
+        );
+      }
 
+      return addTracksJson;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+};
 
 export default Spotify;

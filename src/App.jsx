@@ -11,6 +11,14 @@ function App() {
   const [searchResults, setSearchResults] = useState([]);
   const [playListTracks, setPlayListTracks] = useState([]);
   const [playListName, setPlayListName] = useState("New Playlist");
+  const [isAuthorized, setIsAuthorized] = useState(
+    Boolean(localStorage.getItem("access_token")),
+  );
+
+  // Step 1: Get user's spotify account authorization
+  const getUserAuthorization = useCallback(() => {
+    Spotify.authorize();
+  }, []);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -22,11 +30,9 @@ function App() {
 
     window.history.replaceState({}, document.title, "/");
 
-    Spotify.getToken(authorizationCode).catch((error) => console.log(error));
-  }, []);
-
-  const getUserAuthorization = useCallback(() => {
-    Spotify.authorize();
+    Spotify.getToken(authorizationCode)
+      .then(() => setIsAuthorized(true))
+      .catch((error) => console.log(error));
   }, []);
 
   const search = useCallback((term) => {
@@ -39,7 +45,7 @@ function App() {
 
   const savePlayList = useCallback(() => {
     const trackUris = playListTracks.map((track) => track.uri);
-    Spotify.savePlaylist(playListName, trackUris).then(() => {
+    Spotify.createPlaylist(playListName, trackUris).then(() => {
       setPlayListName("New Playlist");
       setPlayListTracks([]);
     });
@@ -63,8 +69,12 @@ function App() {
 
   return (
     <div>
-      <button type="button" onClick={getUserAuthorization}>
-        Authorize Spotify
+      <button
+        type="button"
+        onClick={getUserAuthorization}
+        disabled={isAuthorized ? true : false}
+      >
+        {isAuthorized ? "Authorized" : "Authorize Spotify"}
       </button>
       <h1>
         Ja<span className="title">mmm</span>ing

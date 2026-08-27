@@ -117,6 +117,59 @@ const Spotify = {
       return [];
     }
   },
-};
+
+  async createPlaylist(playlistName, trackUris) {
+    const accessToken = localStorage.getItem("access_token");
+    const userEndpoint = "https://api.spotify.com/v1/me";
+    const userHeaders = { Authorization: `Bearer ${accessToken}` };
+    let userId;
+ 
+    try {
+      const userResponse = await fetch(userEndpoint, headers);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user ID: ${response.statusText}`);
+      }
+      const userJsonResponse = await userResponse.json();
+      userId = userJsonResponse.id;
+
+      const playlistEndpoint = `https://api.spotify.com/v1/users/${userId}/playlists`;
+      let playlist;
+      const playlistResponse = await fetch(playlistEndpoint, {
+        method: "POST",
+        Headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          name: playlistName,
+          description: "Created with Spotify API",
+          public: true
+         }),
+      });
+
+      const playlistjsonResponse = await playlistResponse.json();
+      playlist = playlistjsonResponse.id;
+
+      const addTracksEndpoint = `https://api.spotify.com/v1/playlists/${playlist}/items
+`
+      const addTracks = await fetch(addTracksEndpoint, {
+        method: "POST",
+        Headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: json.stringify({
+          uris: trackUris,
+          position: 0,
+        })
+      });
+
+      const addTracksJson = addTracks.json();
+      return addTracksJson;
+      
+      } catch (error) {
+      console.log(error);
+}}}
+
 
 export default Spotify;

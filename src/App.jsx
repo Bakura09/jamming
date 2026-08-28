@@ -20,6 +20,7 @@ function App() {
     Spotify.authorize();
   }, []);
 
+  // Step 2: Generate an access_token to use with API calls
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const authorizationCode = urlParams.get("code");

@@ -74,7 +74,7 @@ function App() {
         onClick={getUserAuthorization}
         disabled={isAuthorized ? true : false}
       >
-        {isAuthorized ? "Authorized" : "Authorize Spotify"}
+        {isAuthorized ? "CONNECTED" : "Connect Spotify"}
       </button>
       <h1>
         Ja<span className="title">mmm</span>ing

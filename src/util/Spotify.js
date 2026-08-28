@@ -80,6 +80,7 @@ const Spotify = {
     }
 
     localStorage.setItem("access_token", responseBody.access_token);
+    localStorage.setItem("refresh_token", responseBody.refresh_token);
     return responseBody.access_token;
   },
 
@@ -91,7 +92,7 @@ const Spotify = {
     }
 
     try {
-      const response = await fetch(
+      let response = await fetch(
         `https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}`,
         {
           headers: {
@@ -100,11 +101,65 @@ const Spotify = {
         },
       );
 
+      if (response.status === 401) {
+        const url = "https://accounts.spotify.com/api/token";
+        const refreshToken = localStorage.getItem("refresh_token");
+
+        if (!refreshToken) {
+          localStorage.removeItem("access_token");
+          window.location.href = "/login";
+          return [];
+        }
+
+        const payload = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            grant_type: "refresh_token",
+            refresh_token: refreshToken,
+            client_id: clientId,
+          }),
+        };
+
+        const result = await fetch(url, payload);
+        const resultRes = await result.json();
+
+        if (!result.ok) {
+          if (resultRes.error === "invalid_grant") {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            window.location.href = "/login";
+            return [];
+          }
+
+          throw new Error(`Token refresh failed: ${resultRes.error}`);
+        }
+
+        localStorage.setItem("access_token", resultRes.access_token);
+
+        if (resultRes.refresh_token) {
+          localStorage.setItem("refresh_token", resultRes.refresh_token);
+        }
+
+        // Retry the original search with the new access token
+        response = await fetch(
+          `https://api.spotify.com/v1/search?type=track&q=${encodeURIComponent(term)}`,
+          {
+            headers: {
+              Authorization: `Bearer ${resultRes.access_token}`,
+            },
+          },
+        );
+      }
+
       if (!response.ok) {
         return [];
       }
 
       const responseBody = await response.json();
+
       return responseBody.tracks.items.map((tracks) => ({
         id: tracks.id,
         name: tracks.name,

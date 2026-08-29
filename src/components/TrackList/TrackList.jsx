@@ -1,8 +1,10 @@
 import Tracks from "../Tracks/Tracks";
 
+import styles from "./TrackList.module.css";
+
 function TrackList({ tracks, onAdd, onRemove, isRemoval }) {
   return (
-    <div>
+    <div className={styles.trackList}>
       {tracks.map((track) => {
         return (
           <Tracks

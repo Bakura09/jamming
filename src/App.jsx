@@ -69,27 +69,38 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <button
-        type="button"
-        onClick={getUserAuthorization}
-        disabled={isAuthorized ? true : false}
-      >
-        {isAuthorized ? "CONNECTED" : "Connect Spotify"}
-      </button>
-      <h1>
-        Ja<span className="title">mmm</span>ing
-      </h1>
-      <h4>Enter a track name</h4>
-      <SearchBar onSearch={search} />
-      <SearchResults searchResults={searchResults} onAdd={addTrack} />
-      <PlayList
-        playListName={playListName}
-        playlistTracks={playListTracks}
-        onNameChange={updatePlayListName}
-        onRemove={removeTrack}
-        onSave={savePlayList}
-      />
+    <div className="appShell">
+      <header className="appHeader">
+        <button
+          type="button"
+          className="connectButton"
+          onClick={getUserAuthorization}
+          disabled={isAuthorized}
+        >
+          {isAuthorized ? "CONNECTED" : "Connect Spotify"}
+        </button>
+        <h1 className="appTitle">
+          Ja<span className="titleAccent">mmm</span>ing
+        </h1>
+        <h4 className="appSubtitle">Enter a track name</h4>
+      </header>
+
+      <main className="contentGrid">
+        <section className="panel">
+          <SearchBar onSearch={search} />
+          <SearchResults searchResults={searchResults} onAdd={addTrack} />
+        </section>
+
+        <aside className="panel playlistColumn">
+          <PlayList
+            playListName={playListName}
+            playlistTracks={playListTracks}
+            onNameChange={updatePlayListName}
+            onRemove={removeTrack}
+            onSave={savePlayList}
+          />
+        </aside>
+      </main>
     </div>
   );
 }

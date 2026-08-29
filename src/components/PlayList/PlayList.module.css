@@ -1,0 +1,44 @@
+.playlistPanel {
+  width: 100%;
+}
+
+.playlistInput {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(169, 152, 222, 0.4);
+  background: rgba(15, 11, 24, 0.85);
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.playlistInput:focus {
+  outline: none;
+  border-color: rgba(123, 63, 242, 0.85);
+  box-shadow: 0 0 0 3px rgba(123, 63, 242, 0.18);
+}
+
+.playlistBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.saveButton {
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--spotify-green) 0%, #1cb85c 100%);
+  color: #07130c;
+  padding: 0.9rem 1rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.saveButton:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}

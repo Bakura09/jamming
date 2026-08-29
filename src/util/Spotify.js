@@ -93,7 +93,7 @@ const Spotify = {
 
     try {
       let response = await fetch(
-        `https://api.spotify.com/v1/search?type=track&limit=20&offset=0&q=${encodeURIComponent(term)}`,
+        `https://api.spotify.com/v1/search?type=track&limit=10&offset=5&q=${encodeURIComponent(term)}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -145,7 +145,7 @@ const Spotify = {
 
         // Retry the original search with the new access token
         response = await fetch(
-          `https://api.spotify.com/v1/search?type=track&limit=20&offset=0&q=${encodeURIComponent(term)}`,
+          `https://api.spotify.com/v1/search?type=track&limit=10&offset=5&q=${encodeURIComponent(term)}`,
           {
             headers: {
               Authorization: `Bearer ${resultRes.access_token}`,

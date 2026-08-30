@@ -7,10 +7,15 @@ import SearchResults from "./components/SearchResults/SearchResults.jsx";
 import PlayList from "./components/PlayList/PlayList.jsx";
 import Spotify from "./util/Spotify.js";
 
+const RESULTS_PER_PAGE = 10;
+
 function App() {
   const [searchResults, setSearchResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [playListTracks, setPlayListTracks] = useState([]);
   const [playListName, setPlayListName] = useState("New Playlist");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [isAuthorized, setIsAuthorized] = useState(
     Boolean(localStorage.getItem("access_token")),
   );
@@ -36,8 +41,19 @@ function App() {
       .catch((error) => console.log(error));
   }, []);
 
-  const search = useCallback((term) => {
-    Spotify.search(term).then(setSearchResults);
+  const search = useCallback((term, page = 1) => {
+    const offset = (page - 1) * RESULTS_PER_PAGE;
+    setSearchTerm(term);
+
+    Spotify.search(term, offset, RESULTS_PER_PAGE).then((result) => {
+      const nextPage = Math.floor((result.offset || 0) / RESULTS_PER_PAGE) + 1;
+
+      setSearchResults(result.items || []);
+      setCurrentPage(nextPage);
+      setTotalPages(
+        Math.max(1, Math.ceil((result.total || 0) / RESULTS_PER_PAGE)),
+      );
+    });
   }, []);
 
   const updatePlayListName = useCallback((newName) => {
@@ -88,7 +104,13 @@ function App() {
       <main className="contentGrid">
         <section className="panel">
           <SearchBar onSearch={search} />
-          <SearchResults searchResults={searchResults} onAdd={addTrack} />
+          <SearchResults
+            searchResults={searchResults}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => search(searchTerm, page)}
+            onAdd={addTrack}
+          />
         </section>
 
         <aside className="panel playlistColumn">

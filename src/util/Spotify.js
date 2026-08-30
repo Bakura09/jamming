@@ -84,22 +84,21 @@ const Spotify = {
     return responseBody.access_token;
   },
 
-  async search(term) {
+  async search(term, offset = 0, limit = 10) {
     const accessToken = localStorage.getItem("access_token");
 
     if (!accessToken) {
-      return [];
+      return { items: [], total: 0, limit, offset };
     }
 
     try {
-      let response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(term)}&type=track&limit=10&offset=5`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+      const requestUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(term)}&type=track&limit=${limit}&offset=${offset}`;
+
+      let response = await fetch(requestUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
         },
-      );
+      });
 
       if (response.status === 401) {
         const url = "https://accounts.spotify.com/api/token";
@@ -108,7 +107,7 @@ const Spotify = {
         if (!refreshToken) {
           localStorage.removeItem("access_token");
           window.location.href = "/login";
-          return [];
+          return { items: [], total: 0, limit, offset };
         }
 
         const payload = {
@@ -131,7 +130,7 @@ const Spotify = {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             window.location.href = "/login";
-            return [];
+            return { items: [], total: 0, limit, offset };
           }
 
           throw new Error(`Token refresh failed: ${resultRes.error}`);
@@ -143,34 +142,42 @@ const Spotify = {
           localStorage.setItem("refresh_token", resultRes.refresh_token);
         }
 
-        // Retry the original search with the new access token
-        response = await fetch(
-          `https://api.spotify.com/v1/search?q=${encodeURIComponent(term)}&type=track&limit=10&offset=5`,
-          {
-            headers: {
-              Authorization: `Bearer ${resultRes.access_token}`,
-            },
+        response = await fetch(requestUrl, {
+          headers: {
+            Authorization: `Bearer ${resultRes.access_token}`,
           },
-        );
+        });
       }
 
       if (!response.ok) {
-        return [];
+        return { items: [], total: 0, limit, offset };
       }
 
       const responseBody = await response.json();
+      const tracks = responseBody.tracks || {
+        items: [],
+        total: 0,
+        limit,
+        offset,
+      };
 
-      return responseBody.tracks.items.map((tracks) => ({
-        id: tracks.id,
-        name: tracks.name,
-        artists: tracks.artists,
-        external_urls: tracks.external_urls.spotify,
-        album: tracks.album.name,
-        uri: tracks.uri,
-      }));
+      return {
+        items: tracks.items.map((track) => ({
+          id: track.id,
+          name: track.name,
+          artists: track.artists,
+          external_urls: track.external_urls.spotify,
+          album: track.album.name,
+          uri: track.uri,
+          next: track.next,
+        })),
+        total: tracks.total || 0,
+        limit: tracks.limit || limit,
+        offset: tracks.offset || offset,
+      };
     } catch (error) {
       console.log(error);
-      return [];
+      return { items: [], total: 0, limit, offset };
     }
   },
 

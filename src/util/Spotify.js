@@ -1,5 +1,5 @@
 const clientId = "b0711ae33c064f19aa7319a60216fe4c";
-const redirectUri = "http://127.0.0.1:5173/callback";
+const redirectUri = "https://extraordinary-alfajores-cb3665.netlify.app/";
 
 const Spotify = {
   async authorize() {
